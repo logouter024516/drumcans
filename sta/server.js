@@ -28,9 +28,6 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = join(__dirname, 'node_modules', 'pdfjs-
 dotenv.config({ path: join(__dirname, '.env'), override: true });
 
 
-console.log("process.env.OPEN_KEY = ", process.env.OPENAI_API_KEY);
-
-
 const app = express();
 const upload = multer({ dest: "uploads/" });
 
@@ -131,14 +128,13 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 
 출력 형식 예시:
 {
-  "ai_probability": 85,
-  "suspicious_sentences": ["3.1   데이터   설명  본   연구에서는   kaggle 에서   제공하는   “Rossmann   Store   Sales”   데이터셋을   수정   활용하였다 .  주요   속성은   Date,   Store,   Sales,   Promo,   DayOfWeek,   SchoolHoliday   등이다 .", "이는   실시간   재고   및  물류   관리에   활용   가능함을   시사한다 .  향후   연구에서는   외부   요인 ( 날씨 ,   지역   이벤트   등 ) 을   포함한   다변량   예측 , 그 외 의심되는 문장"]
+  "AI 작성 확률": 85,
+  "AI 의심 문장": ["3.1   데이터   설명  본   연구에서는   kaggle 에서   제공하는   “Rossmann   Store   Sales”   데이터셋을   수정   활용하였다 .  주요   속성은   Date,   Store,   Sales,   Promo,   DayOfWeek,   SchoolHoliday   등이다 .", "이는   실시간   재고   및  물류   관리에   활용   가능함을   시사한다 .  향후   연구에서는   외부   요인 ( 날씨 ,   지역   이벤트   등 ) 을   포함한   다변량   예측 , 그 외 의심되는 문장"]
   "AI로 판별한 이유": [위 문장을 탐지한 이유 작성]
 }
 텍스트:
 ${text}
 `;
-          console.log(text);
           const completionStream = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [{ role: "user", content: prompt }],
