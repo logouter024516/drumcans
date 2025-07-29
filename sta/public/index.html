@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>PDF AI 감지</title>
+</head>
+<body>
+  <h1>PDF AI 감지</h1>
+  <input type="file" id="file" accept="application/pdf" />
+  <button id="uploadBtn">업로드</button>
+  <pre id="output" style="white-space: pre-wrap; border:1px solid #ccc; padding:10px; max-height:400px; overflow:auto;"></pre>
+
+  <script>
+    document.getElementById("uploadBtn").addEventListener("click", async () => {
+      const fileInput = document.getElementById("file");
+      if (!fileInput.files.length) {
+        alert("PDF 파일을 선택해주세요.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("pdf", fileInput.files[0]);
+
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        alert("서버 에러: " + response.statusText);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let result = "";
+
+      const output = document.getElementById("output");
+      output.textContent = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        result += decoder.decode(value, { stream: true });
+        output.textContent = result;
+      }
+
+      try {
+        const jsonResult = JSON.parse(result);
+        console.log("AI 감지 결과:", jsonResult);
+      } catch {
+        console.warn("결과가 JSON이 아닙니다.");
+      }
+    });
+  </script>
+</body>
+</html>
