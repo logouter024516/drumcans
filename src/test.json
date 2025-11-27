@@ -1,0 +1,9 @@
+{
+    "title": "Write paper title",
+    "author": "Write paper author",
+    "score": 100,
+    "scoreUsage": "What kind of score index is it? Write here(e.g., SCI, IF, CiteScore.)",
+    "aiScore": "Write AI Suspicion Score here",
+    "aiReason":"Write why this paper detected to write by AI",
+    "summary": "Write paper summary here"
+}
