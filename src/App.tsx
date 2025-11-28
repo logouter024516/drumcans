@@ -6,9 +6,11 @@ import { Login } from './pages/Login';
 import './App.css';
 
 function App() {
-  const basename = import.meta.env.BASE_URL || '/';
+  const rawBase = import.meta.env.BASE_URL || '/';
+  const normalizedBase = rawBase.replace(/\/+$/, '') || '/';
+  const routerBase = normalizedBase === '/' ? undefined : normalizedBase;
   return (
-    <Router basename={basename}>
+    <Router basename={routerBase}>
       <div className="app-container">
         <Navbar />
         <main className="main-content">
