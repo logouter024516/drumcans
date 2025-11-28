@@ -6,8 +6,9 @@ import { Login } from './pages/Login';
 import './App.css';
 
 function App() {
+  const basename = import.meta.env.BASE_URL || '/';
   return (
-    <Router>
+    <Router basename={basename}>
       <div className="app-container">
         <Navbar />
         <main className="main-content">
