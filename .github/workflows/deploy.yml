@@ -1,4 +1,4 @@
-# actionlint: allow-secrets: VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY
+# actionlint: allow-secrets: VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY,VITE_GEMINI_API_KEY
 # actionlint: allow-vars: VITE_MONTHLY_CREDIT
 name: Deploy Vite to GitHub Pages
 
@@ -32,6 +32,7 @@ jobs:
           SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
           SUPABASE_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}"
           MONTHLY_CREDIT_VAL="${{ vars.VITE_MONTHLY_CREDIT }}"
+          GEMINI_KEY="${{ secrets.VITE_GEMINI_API_KEY }}"
 
           if [ -z "$SUPABASE_URL" ]; then
             echo "Missing secret: VITE_SUPABASE_URL" >&2
@@ -43,6 +44,11 @@ jobs:
             exit 1
           fi
 
+          if [ -z "$GEMINI_KEY" ]; then
+            echo "Missing secret: VITE_GEMINI_API_KEY" >&2
+            exit 1
+          fi
+
           if [ -z "$MONTHLY_CREDIT_VAL" ]; then
             echo "No VITE_MONTHLY_CREDIT var supplied; defaulting to 300" >&2
           fi
@@ -51,6 +57,7 @@ jobs:
         run: |
           SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
           SUPABASE_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+          GEMINI_KEY="${{ secrets.VITE_GEMINI_API_KEY }}"
           CREDIT_VALUE="${{ vars.VITE_MONTHLY_CREDIT }}"
           if [ -z "$CREDIT_VALUE" ]; then
             CREDIT_VALUE=300
@@ -59,9 +66,14 @@ jobs:
             echo "Supabase credentials are missing; ensure secrets are configured." >&2
             exit 1
           fi
+          if [ -z "$GEMINI_KEY" ]; then
+            echo "Gemini API key is missing; ensure secrets are configured." >&2
+            exit 1
+          fi
           cat <<EOF > .env
           VITE_SUPABASE_URL=${SUPABASE_URL}
           VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY}
+          VITE_GEMINI_API_KEY=${GEMINI_KEY}
           VITE_MONTHLY_CREDIT=${CREDIT_VALUE}
           EOF
 
