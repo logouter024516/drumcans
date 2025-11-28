@@ -15,7 +15,7 @@ function App() {
         <Navbar />
         <main className="main-content">
           <Routes>
-            <Route path="/" element={<Analyzer />} />
+            <Route path="*" element={<Analyzer />} />
             <Route path="/history" element={<History />} />
             <Route path="/login" element={<Login />} />
           </Routes>
