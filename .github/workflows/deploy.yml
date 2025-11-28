@@ -1,3 +1,5 @@
+# actionlint: allow-secrets: VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY
+# actionlint: allow-vars: VITE_MONTHLY_CREDIT
 name: Deploy Vite to GitHub Pages
 
 on:
@@ -20,9 +22,48 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Validate deployment secrets
+        run: |
+          SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
+          SUPABASE_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+          MONTHLY_CREDIT_VAL="${{ vars.VITE_MONTHLY_CREDIT }}"
+
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "Missing secret: VITE_SUPABASE_URL" >&2
+            exit 1
+          fi
+
+          if [ -z "$SUPABASE_KEY" ]; then
+            echo "Missing secret: VITE_SUPABASE_ANON_KEY" >&2
+            exit 1
+          fi
+
+          if [ -z "$MONTHLY_CREDIT_VAL" ]; then
+            echo "No VITE_MONTHLY_CREDIT var supplied; defaulting to 300" >&2
+          fi
+
+      - name: Create Vite env file
+        run: |
+          SUPABASE_URL="${{ secrets.VITE_SUPABASE_URL }}"
+          SUPABASE_KEY="${{ secrets.VITE_SUPABASE_ANON_KEY }}"
+          CREDIT_VALUE="${{ vars.VITE_MONTHLY_CREDIT }}"
+          if [ -z "$CREDIT_VALUE" ]; then
+            CREDIT_VALUE=300
+          fi
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_KEY" ]; then
+            echo "Supabase credentials are missing; ensure secrets are configured." >&2
+            exit 1
+          fi
+          cat <<EOF > .env
+          VITE_SUPABASE_URL=${SUPABASE_URL}
+          VITE_SUPABASE_ANON_KEY=${SUPABASE_KEY}
+          VITE_MONTHLY_CREDIT=${CREDIT_VALUE}
+          EOF
 
       - name: Build
         run: npm run build
